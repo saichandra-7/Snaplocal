@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if role == 'customer' %}Customer Login
+  {% elif role == 'provider' %}Service Provider Login
+  {% else %}Admin Portal Login{% endif %} | SnapLocal
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 480px; margin: 40px auto 80px;">
+  
+  <div style="text-align: center; margin-bottom: 28px;">
+    {% if role == 'customer' %}
+      <span class="persona-badge role-customer" style="font-size: 0.85rem; padding: 4px 14px;">👥 CUSTOMER PORTAL</span>
+      <h1 style="font-size: 2.2rem; color: #fff; margin-top: 10px;">Customer Login</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+        Sign in to book photography packages, manage shoots, and view receipts.
+      </p>
+    {% elif role == 'provider' %}
+      <span class="persona-badge role-provider" style="font-size: 0.85rem; padding: 4px 14px;">📸 PROVIDER PORTAL</span>
+      <h1 style="font-size: 2.2rem; color: #fff; margin-top: 10px;">Service Provider Login</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+        Sign in to manage listings, accept bookings, and track your net earnings.
+      </p>
+    {% else %}
+      <span class="persona-badge role-admin" style="font-size: 0.85rem; padding: 4px 14px;">🛡️ RESTRICTED ADMIN</span>
+      <h1 style="font-size: 2.2rem; color: #fff; margin-top: 10px;">Platform Admin Login</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+        Authorized administrators only. Server-side role enforcement active.
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="data-card" style="padding: 32px;">
+    
+    <!-- Flash message alerts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: #fb7185; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 20px;">
+            ⚠️ {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('role_login', role=role, next=next_url) }}">
+      <div class="form-group">
+        <label for="input-email" class="form-label">Email Address</label>
+        <input type="email" id="input-email" name="email" class="form-input" placeholder="name@example.com" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="input-password" class="form-label">Password</label>
+        <input type="password" id="input-password" name="password" class="form-input" placeholder="Enter your password" required>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button type="submit" class="btn {% if role == 'provider' %}btn-success{% else %}btn-primary{% endif %}" style="width: 100%; padding: 14px; font-size: 1rem;">
+          Sign In to {{ role|capitalize }} Dashboard
+        </button>
+      </div>
+    </form>
+
+    <!-- Quick test auto-fill buttons for convenience -->
+    <div style="margin-top: 20px; border-top: 1px dashed var(--border-glass); padding-top: 16px; text-align: center;">
+      <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">Quick test auto-fill:</div>
+      {% if role == 'customer' %}
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('rohan@gmail.com', 'customer123')">
+          Auto-fill Rohan Patel (Customer)
+        </button>
+      {% elif role == 'provider' %}
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('arjun.lens@snaplocal.com', 'provider123')">
+          Auto-fill Arjun Sharma (Photographer)
+        </button>
+      {% else %}
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin@snaplocal.com', 'admin123')">
+          Auto-fill Vikram Malhotra (Admin)
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- Navigation links -->
+    <div style="margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+      {% if role in ('customer', 'provider') %}
+        Don't have a {{ role|capitalize }} account?
+        <a href="{{ url_for('role_register', role=role) }}" style="color: var(--amber-light); font-weight: 700;">
+          Register here →
+        </a>
+      {% endif %}
+      <div style="margin-top: 10px;">
+        <a href="{{ url_for('auth_role_select') }}" style="color: var(--text-dim); font-size: 0.8rem;">
+          ← Switch to another role portal
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function quickFill(email, pwd) {
+  document.getElementById('input-email').value = email;
+  document.getElementById('input-password').value = pwd;
+}
+</script>
+{% endblock %}

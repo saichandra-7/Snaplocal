@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied | SnapLocal Security Boundary{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="text-align: center; padding: 80px 20px;">
+  <div style="font-size: 3.5rem; margin-bottom: 16px;">🛡️</div>
+  <h1 style="color: #fff; font-size: 2.2rem; margin-bottom: 12px;">Access Denied (HTTP 403)</h1>
+  <p style="color: var(--text-muted); max-width: 520px; margin: 0 auto 24px; font-size: 1.05rem;">
+    {{ message or "You do not have the required permissions to access this restricted platform area." }}
+  </p>
+
+  <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 22px; max-width: 480px; margin: 0 auto 28px; text-align: left;">
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+      🔒 <strong>Role-Based Access Enforcement:</strong>
+    </div>
+    <div style="font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;">
+      SnapLocal enforces strict separation between Customer, Service Provider, and Administrator interfaces. Account roles cannot be escalated by modifying URLs or form parameters.
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+    <a href="{{ url_for('auth_role_select') }}" class="btn btn-primary">
+      🔑 Switch Account / Role Portal
+    </a>
+    <a href="/" class="btn btn-secondary">
+      Return to Marketplace
+    </a>
+  </div>
+</div>
+{% endblock %}

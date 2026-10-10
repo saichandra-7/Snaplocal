@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}SnapLocal | Hyperlocal Photography & Gear Marketplace{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">
+        <span>📍 Hyperlocal Photography Network</span>
+        <span>•</span>
+        <span>Bengaluru Hub</span>
+      </div>
+      <h1 class="hero-title">
+        Book Top Local <span class="gradient-text">Photographers & Camera Gear</span> in Minutes
+      </h1>
+      <p class="hero-desc">
+        SnapLocal connects creators and customers with transparent pricing, instant booking, and seamless shoot coordination inspired by on-demand hyperlocal networks.
+      </p>
+
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <a href="#package-builder" class="btn btn-primary" style="padding: 14px 26px; font-size: 1rem;">
+          ⚡ Build Your Package
+        </a>
+        <a href="#explore-listings" class="btn btn-secondary" style="padding: 14px 24px; font-size: 1rem;">
+          📷 Browse Creators & Gear
+        </a>
+      </div>
+
+      <div style="display: flex; gap: 28px; margin-top: 36px;">
+        <div>
+          <div style="font-size: 1.5rem; font-weight: 800; color: #fff;">100%</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Transparent Pricing</div>
+        </div>
+        <div style="border-left: 1px solid var(--border-subtle); padding-left: 28px;">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--amber-light);">4 Models</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Custom Flexibility</div>
+        </div>
+        <div style="border-left: 1px solid var(--border-subtle); padding-left: 28px;">
+          <div style="font-size: 1.5rem; font-weight: 800; color: #34d399;">Verified</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Gear & Operators</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hero-image-wrapper">
+        <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Cinematic Photography Studio" class="hero-img">
+        <div class="hero-image-overlay">
+          <div>
+            <div style="color: #fff; font-weight: 700; font-size: 1.1rem;">Arjun Sharma Studio</div>
+            <div style="color: var(--text-muted); font-size: 0.8rem;">Indiranagar, Bengaluru • 4.95 ★</div>
+          </div>
+          <div class="commission-tag" style="background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc;">
+            ✓ Verified Partner Studio
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 Booking Models Showcase -->
+<section class="models-section">
+  <div class="section-header">
+    <div class="section-subtitle">Flexible Booking Architecture</div>
+    <h2 class="section-title">Choose Any of Our 4 Booking Types</h2>
+    <p style="color: var(--text-muted); max-width: 600px; margin: 10px auto 0;">
+      Whether you need an all-in-one photographer, freelance operator, gear rental, or a custom hybrid bundle.
+    </p>
+  </div>
+
+  <div class="models-grid">
+    <!-- Model 1 -->
+    <div class="model-card active" onclick="selectModelChoice('photographer_with_gear')">
+      <div class="model-badge">TYPE 1</div>
+      <div>
+        <div class="model-icon">📸</div>
+        <h3 class="model-title">Photographer with Camera</h3>
+        <p class="model-desc">
+          Complete turnkey package. Professional photographer brings their own flagship cameras, lenses, and flash gear.
+        </p>
+      </div>
+      <div class="model-action-btn">
+        Select Package →
+      </div>
+    </div>
+
+    <!-- Model 2 -->
+    <div class="model-card" onclick="selectModelChoice('photographer_only')">
+      <div class="model-badge">TYPE 2</div>
+      <div>
+        <div class="model-icon">👤</div>
+        <h3 class="model-title">Photographer Only (No Gear)</h3>
+        <p class="model-desc">
+          Freelance shooter/operator only. Bring your own cameras or production studio equipment; pay only for skill & time.
+        </p>
+      </div>
+      <div class="model-action-btn">
+        Select Package →
+      </div>
+    </div>
+
+    <!-- Model 3 -->
+    <div class="model-card" onclick="selectModelChoice('gear_rental')">
+      <div class="model-badge">TYPE 3</div>
+      <div>
+        <div class="model-icon">🎥</div>
+        <h3 class="model-title">Camera & Gear Rental Only</h3>
+        <p class="model-desc">
+          Rent high-end cinema bodies (Sony FX3, Canon R5), prime lenses, gimbals, and drones from verified local rental owners.
+        </p>
+      </div>
+      <div class="model-action-btn">
+        Select Package →
+      </div>
+    </div>
+
+    <!-- Model 4 -->
+    <div class="model-card" onclick="selectModelChoice('photographer_plus_rented_gear')">
+      <div class="model-badge">TYPE 4</div>
+      <div>
+        <div class="model-icon">⚡</div>
+        <h3 class="model-title">Photographer + Rented Gear</h3>
+        <p class="model-desc">
+          Combined superpower: Pair an expert freelance cameraman with cinema gear rented from a local gear provider.
+        </p>
+      </div>
+      <div class="model-action-btn">
+        Select Package →
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Package Customizer & Live Transparent Price Engine -->
+<section id="package-builder" class="dashboard-container" style="margin-top: 0;">
+  <div class="section-header">
+    <div class="section-subtitle">Real-Time Price Calculator</div>
+    <h2 class="section-title">Customize Package & Review Transparent Pricing</h2>
+    <p style="color: var(--text-muted); max-width: 620px; margin: 8px auto 0;">
+      Instant price quote with zero hidden charges. Choose options below and submit your shoot request.
+    </p>
+  </div>
+
+  <div class="customizer-box">
+    <div class="customizer-grid">
+      <!-- Left: Configuration Form -->
+      <div>
+        <form id="booking-customizer-form">
+          <!-- 1. Booking Type Selection -->
+          <div class="form-group">
+            <label class="form-label">Step 1: Select Booking Type</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <label style="background: rgba(15,23,42,0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem;">
+                <input type="radio" name="booking_type_choice" value="photographer_with_gear" checked>
+                <span>Photographer with Gear</span>
+              </label>
+
+              <label style="background: rgba(15,23,42,0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem;">
+                <input type="radio" name="booking_type_choice" value="photographer_only">
+                <span>Photographer (Shooter Only)</span>
+              </label>
+
+              <label style="background: rgba(15,23,42,0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem;">
+                <input type="radio" name="booking_type_choice" value="gear_rental">
+                <span>Camera / Gear Rental Only</span>
+              </label>
+
+              <label style="background: rgba(15,23,42,0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem;">
+                <input type="radio" name="booking_type_choice" value="photographer_plus_rented_gear">
+                <span>Photographer + Rented Gear</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 2. Select Photographer -->
+          <div class="form-group" id="photographer-field-group">
+            <label for="select-photographer" class="form-label">Step 2: Choose Photographer</label>
+            <select id="select-photographer" class="form-select">
+              {% for p in photographers_with_gear %}
+                <option value="{{ p.id }}" data-type="{{ p.listing_type }}" data-price="{{ p.base_rate }}">
+                  {{ p.title }} (₹{{ p.base_rate }}) • {{ p.location }}
+                </option>
+              {% endfor %}
+              {% for p in photographers_only %}
+                <option value="{{ p.id }}" data-type="{{ p.listing_type }}" data-price="{{ p.base_rate }}" style="display: none;">
+                  {{ p.title }} (₹{{ p.base_rate }}) • {{ p.location }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- 3. Select Gear Rental -->
+          <div class="form-group" id="gear-field-group" style="display: none;">
+            <label for="select-gear" class="form-label">Choose Camera / Lens Rental Kit</label>
+            <select id="select-gear" class="form-select">
+              {% for g in gear_rentals %}
+                <option value="{{ g.id }}" data-price="{{ g.base_rate }}">
+                  {{ g.title }} (₹{{ g.base_rate }} / day) • {{ g.location }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- 4. Schedule & Location -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="input-service-date" class="form-label">Shoot / Rental Date</label>
+              <input type="date" id="input-service-date" class="form-input" value="2026-10-15">
+            </div>
+            <div class="form-group">
+              <label for="input-service-time" class="form-label">Time Slot</label>
+              <select id="input-service-time" class="form-select">
+                <option value="09:00 AM">09:00 AM - 01:00 PM (Morning Slot)</option>
+                <option value="02:00 PM">02:00 PM - 06:00 PM (Afternoon Slot)</option>
+                <option value="06:00 PM">06:00 PM - 10:00 PM (Evening/Golden Hour)</option>
+                <option value="Full Day">Full Day (All Day Booking)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-location" class="form-label">Shoot Location / Delivery Address</label>
+            <input type="text" id="input-location" class="form-input" value="Indiranagar 100ft Road, Bengaluru" placeholder="Enter venue or pickup address">
+          </div>
+
+          <!-- 5. Optional Add-ons -->
+          <div class="form-group">
+            <label class="form-label">Optional Production Add-ons</label>
+            <div class="addons-grid">
+              <label class="addon-card">
+                <input type="checkbox" class="addon-checkbox" value="drone" data-title="Drone Aerial Coverage" data-price="1200.00">
+                <div class="addon-info">
+                  <div class="addon-title">🚁 Drone 4K Aerial Coverage</div>
+                  <div class="addon-price">+₹1,200.00</div>
+                </div>
+              </label>
+
+              <label class="addon-card">
+                <input type="checkbox" class="addon-checkbox" value="lighting" data-title="Studio Lighting Grid" data-price="800.00">
+                <div class="addon-info">
+                  <div class="addon-title">💡 Studio Lighting Grid & Softbox</div>
+                  <div class="addon-price">+₹800.00</div>
+                </div>
+              </label>
+
+              <label class="addon-card">
+                <input type="checkbox" class="addon-checkbox" value="express" data-title="24-Hour Express Delivery" data-price="500.00">
+                <div class="addon-info">
+                  <div class="addon-title">⚡ 24h Express Photo Delivery</div>
+                  <div class="addon-price">+₹500.00</div>
+                </div>
+              </label>
+
+              <label class="addon-card">
+                <input type="checkbox" class="addon-checkbox" value="extra_hours" data-title="Extra 2 Hours Shoot" data-price="600.00">
+                <div class="addon-info">
+                  <div class="addon-title">⏱️ Extra Shoot Time (+2 hrs)</div>
+                  <div class="addon-price">+₹600.00</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-notes" class="form-label">Special Creative Instructions</label>
+            <textarea id="input-notes" class="form-textarea" rows="2" placeholder="e.g. Bring wide prime lens, candid portraits, corporate look..."></textarea>
+          </div>
+
+          {% if is_authenticated and current_user.role == 'customer' %}
+            <button type="submit" id="btn-submit-booking" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+              📩 Submit Booking Request
+            </button>
+          {% elif is_authenticated and current_user.role != 'customer' %}
+            <div style="background: rgba(245, 158, 11, 0.12); padding: 12px; border-radius: 8px; text-align: center; color: var(--amber-light); font-size: 0.85rem;">
+              ⚠️ You are logged in as a <strong>{{ current_user.role|capitalize }}</strong>. Booking requests can only be placed by Customer accounts.
+            </div>
+          {% else %}
+            <a href="{{ url_for('role_login', role='customer', next='/#package-builder') }}" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; text-align: center; display: block;">
+              Sign In as Customer to Book
+            </a>
+          {% endif %}
+        </form>
+      </div>
+
+      <!-- Right: Customer Price Breakdown (Zero owner commission exposed) -->
+      <div>
+        <div class="quote-summary-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.2rem; color: #fff;">Price Breakdown</h3>
+            <span class="badge badge-booking-Pending">Instant Estimate</span>
+          </div>
+
+          <div class="breakdown-row" id="row-photographer-fee">
+            <span style="color: var(--text-muted);">Photographer Service Fee:</span>
+            <span class="amount-highlight" id="quote-photographer-fee">₹2,500.00</span>
+          </div>
+
+          <div class="breakdown-row" id="row-gear-fee" style="display: none;">
+            <span style="color: var(--text-muted);">Camera & Gear Rental Fee:</span>
+            <span class="amount-highlight" id="quote-gear-fee">₹0.00</span>
+          </div>
+
+          <div class="breakdown-row" id="row-addons-fee" style="display: none;">
+            <span style="color: var(--text-muted);">Selected Add-on Services:</span>
+            <span class="amount-highlight" id="quote-addons-fee">₹0.00</span>
+          </div>
+
+          <div class="breakdown-row" id="row-taxes-fee">
+            <span style="color: var(--text-muted);">Applicable Platform Taxes:</span>
+            <span id="quote-taxes-fee" style="color: var(--text-muted);">₹0.00</span>
+          </div>
+
+          <div class="breakdown-row total-row">
+            <span>Total Customer Payment:</span>
+            <span id="quote-total-payment" style="color: var(--amber-light); font-size: 1.4rem;">₹2,500.00</span>
+          </div>
+
+          <div class="payout-box" style="background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.25);">
+            <div class="payout-box-title" style="color: #a5b4fc;">
+              <span>🛡️ Customer Guarantee</span>
+              <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Transparent</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45;">
+              What you see is what you pay. Zero hidden booking fees or post-shoot surprise charges. Funds are safely held in escrow until the service is delivered.
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; font-size: 0.78rem; color: var(--text-dim); line-height: 1.4;">
+            * Submitting request creates a <strong>Pending</strong> booking. Once the provider accepts, you will proceed to the simulated Demo Checkout.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Marketplace Listings Grid with Filtering -->
+<section id="explore-listings" class="listings-section">
+  <div class="section-header">
+    <div class="section-subtitle">Verified Providers</div>
+    <h2 class="section-title">Explore Photographers & Rental Kits</h2>
+    <p style="color: var(--text-muted);">Discover top-rated talent and premium cinema production equipment in Bengaluru</p>
+  </div>
+
+  <!-- Filters Bar -->
+  <div style="background: var(--bg-glass-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 28px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+    <div style="font-size: 0.85rem; font-weight: 700; color: #fff;">Filters:</div>
+    <a href="/#explore-listings" class="btn btn-secondary btn-sm {% if not type_filter and not category_filter %}btn-primary{% endif %}">
+      All
+    </a>
+    <a href="/?type=photographer_with_gear#explore-listings" class="btn btn-secondary btn-sm {% if type_filter == 'photographer_with_gear' %}btn-primary{% endif %}">
+      📸 Photographers with Gear
+    </a>
+    <a href="/?type=photographer_only#explore-listings" class="btn btn-secondary btn-sm {% if type_filter == 'photographer_only' %}btn-primary{% endif %}">
+      👤 Freelance Shooters
+    </a>
+    <a href="/?type=gear_rental#explore-listings" class="btn btn-secondary btn-sm {% if type_filter == 'gear_rental' %}btn-primary{% endif %}">
+      🎥 Camera & Lens Rentals
+    </a>
+  </div>
+
+  <div class="listings-grid">
+    {% for item in all_listings %}
+      <div class="listing-card">
+        <div class="listing-img-box">
+          <img src="{{ item.image_url or url_for('static', filename='images/hero.jpg') }}" alt="{{ item.title }}" class="listing-img">
+          <div class="listing-tag">
+            {% if item.listing_type == 'photographer_with_gear' %}
+              📸 Photographer + Kit
+            {% elif item.listing_type == 'photographer_only' %}
+              👤 Freelance Shooter Only
+            {% else %}
+              🎥 Camera Rental Kit
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="listing-content">
+          <div>
+            <div class="listing-category">{{ item.category }}</div>
+            <h3 class="listing-title">{{ item.title }}</h3>
+            <p class="listing-gear">
+              <strong>Gear:</strong> {{ item.gear_details }}
+            </p>
+            {% if item.rental_conditions %}
+              <p style="font-size: 0.75rem; color: var(--amber-light); margin-top: 4px;">
+                <strong>Conditions:</strong> {{ item.rental_conditions }}
+              </p>
+            {% endif %}
+          </div>
+
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+              <span>📍 {{ item.location }}</span>
+              <span>•</span>
+              <span style="color: #fbbf24;">★ {{ item.rating }} ({{ item.reviews_count }})</span>
+            </div>
+
+            <div class="listing-meta">
+              <div class="listing-price">
+                ₹{{ item.base_rate }} <span>/ {{ item.rate_unit.replace('_', ' ') }}</span>
+              </div>
+              <a href="#package-builder" class="btn btn-secondary btn-sm" onclick="preselectListing({{ item.id }}, '{{ item.listing_type }}')">
+                Select
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+function selectModelChoice(type) {
+  const radio = document.querySelector(`input[name="booking_type_choice"][value="${type}"]`);
+  if (radio) {
+    radio.checked = true;
+    document.querySelectorAll('.model-card').forEach(c => c.classList.remove('active'));
+    const event = new Event('change');
+    radio.dispatchEvent(event);
+    document.getElementById('package-builder').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function preselectListing(id, type) {
+  selectModelChoice(type);
+  if (type === 'gear_rental') {
+    const gSelect = document.getElementById('select-gear');
+    if (gSelect) {
+      gSelect.value = id;
+      gSelect.dispatchEvent(new Event('change'));
+    }
+  } else {
+    const pSelect = document.getElementById('select-photographer');
+    if (pSelect) {
+      pSelect.value = id;
+      pSelect.dispatchEvent(new Event('change'));
+    }
+  }
+}
+</script>
+
+{% endblock %}

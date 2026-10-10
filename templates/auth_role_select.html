@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Role | SnapLocal Photography Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 980px; margin: 40px auto 80px; text-align: center;">
+  
+  <div style="margin-bottom: 36px;">
+    <span class="demo-pill" style="font-size: 0.8rem; padding: 4px 12px; margin-bottom: 12px;">🔐 SECURE ACCESS PORTAL</span>
+    <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">How would you like to continue?</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 10px auto 0;">
+      Select your account type to access your tailored dashboard, bookings, or provider earnings.
+    </p>
+  </div>
+
+  <div class="models-grid" style="grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: left;">
+    
+    <!-- Role 1: Customer -->
+    <div class="model-card" style="border-top: 4px solid var(--indigo-accent); display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
+      <div>
+        <div class="model-badge" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc;">CUSTOMER</div>
+        <div class="model-icon" style="font-size: 2.4rem; margin-bottom: 16px;">👥</div>
+        <h3 class="model-title" style="font-size: 1.4rem;">Customer</h3>
+        <p class="model-desc" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
+          Discover and hire local photographers, freelance camera operators, or rent high-end camera equipment for your shoots, events, and weddings.
+        </p>
+        <ul style="list-style: none; padding: 0; margin-top: 16px; font-size: 0.85rem; color: var(--text-dim); display: flex; flex-direction: column; gap: 6px;">
+          <li>✓ Browse & filter 4 booking models</li>
+          <li>✓ Transparent customer pricing</li>
+          <li>✓ Demo sandbox checkout & receipts</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+        <a href="{{ url_for('role_login', role='customer', next=next_url) }}" class="btn btn-primary" style="width: 100%; text-align: center;">
+          Customer Login
+        </a>
+        <a href="{{ url_for('role_register', role='customer') }}" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center;">
+          Create New Customer Account
+        </a>
+      </div>
+    </div>
+
+    <!-- Role 2: Service Provider -->
+    <div class="model-card" style="border-top: 4px solid var(--emerald-accent); display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
+      <div>
+        <div class="model-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">SERVICE PROVIDER</div>
+        <div class="model-icon" style="font-size: 2.4rem; margin-bottom: 16px;">📸</div>
+        <h3 class="model-title" style="font-size: 1.4rem;">Service Provider</h3>
+        <p class="model-desc" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
+          Photographers, videographers, cameramen, or camera rental houses. List services, manage availability calendar, accept requests, and track net payouts.
+        </p>
+        <ul style="list-style: none; padding: 0; margin-top: 16px; font-size: 0.85rem; color: var(--text-dim); display: flex; flex-direction: column; gap: 6px;">
+          <li>✓ Publish photography & gear listings</li>
+          <li>✓ Set available dates & time slots</li>
+          <li>✓ Accept requests & monitor net earnings</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+        <a href="{{ url_for('role_login', role='provider', next=next_url) }}" class="btn btn-success" style="width: 100%; text-align: center;">
+          Provider Login
+        </a>
+        <a href="{{ url_for('role_register', role='provider') }}" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center;">
+          Join as Service Provider
+        </a>
+      </div>
+    </div>
+
+    <!-- Role 3: Admin (Restricted) -->
+    <div class="model-card" style="border-top: 4px solid var(--amber-primary); display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
+      <div>
+        <div class="model-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">RESTRICTED</div>
+        <div class="model-icon" style="font-size: 2.4rem; margin-bottom: 16px;">🛡️</div>
+        <h3 class="model-title" style="font-size: 1.4rem;">Admin Portal</h3>
+        <p class="model-desc" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
+          Restricted platform management for the business owner. Manage users, oversee commission revenue, configure platform rates, and disburse provider payouts.
+        </p>
+        <ul style="list-style: none; padding: 0; margin-top: 16px; font-size: 0.85rem; color: var(--text-dim); display: flex; flex-direction: column; gap: 6px;">
+          <li>🔒 Server-enforced administrator role</li>
+          <li>🔒 Platform-wide revenue & commission audit</li>
+          <li>🔒 Listing moderation & payout settlements</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+        <a href="{{ url_for('role_login', role='admin', next=next_url) }}" class="btn btn-secondary" style="width: 100%; text-align: center; border-color: var(--amber-primary); color: var(--amber-light);">
+          Admin Login (Restricted)
+        </a>
+        <div style="font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 6px 0;">
+          * Public registration disabled for admin accounts
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Demo Credentials helper box -->
+  <div style="margin-top: 48px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px 24px; text-align: left; max-width: 820px; margin-left: auto; margin-right: auto;">
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--amber-light); margin-bottom: 8px;">
+      ⚡ Pre-configured Seed Accounts for Evaluation:
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 0.82rem;">
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
+        <div style="color: #a5b4fc; font-weight: 700;">Customer Account:</div>
+        <div>Email: <code style="color: #fff;">rohan@gmail.com</code></div>
+        <div>Password: <code style="color: #fff;">customer123</code></div>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
+        <div style="color: #34d399; font-weight: 700;">Provider Account:</div>
+        <div>Email: <code style="color: #fff;">arjun.lens@snaplocal.com</code></div>
+        <div>Password: <code style="color: #fff;">provider123</code></div>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
+        <div style="color: #fbbf24; font-weight: 700;">Admin Account:</div>
+        <div>Email: <code style="color: #fff;">admin@snaplocal.com</code></div>
+        <div>Password: <code style="color: #fff;">admin123</code></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

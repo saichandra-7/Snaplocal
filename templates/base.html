@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SnapLocal | Hyperlocal Photography & Gear Marketplace{% endblock %}</title>
+  <meta name="description" content="SnapLocal is a hyperlocal photography and camera rental marketplace connecting local creators with customers.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Top Authentication & Role Status Bar -->
+  <div class="persona-bar">
+    <div class="persona-info">
+      {% if is_authenticated %}
+        <span class="persona-badge role-{{ current_user.role }}">
+          ● {{ current_user.role|capitalize }}
+        </span>
+        <span style="color: var(--text-muted); font-size: 0.85rem;">
+          Logged in as: <strong style="color: #fff;">{{ current_user.name }}</strong> ({{ current_user.email }})
+        </span>
+      {% else %}
+        <span class="demo-pill">🔒 SECURE MARKETPLACE</span>
+        <span style="color: var(--text-muted); font-size: 0.85rem;">
+          Browse photography talent and cinema equipment. Sign in to book or manage services.
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      {% if is_authenticated %}
+        {% if current_user.role == 'customer' %}
+          <a href="/customer" style="color: #a5b4fc; font-size: 0.82rem; font-weight: 600;">👤 My Bookings</a>
+        {% elif current_user.role == 'provider' %}
+          <a href="/provider" style="color: #34d399; font-size: 0.82rem; font-weight: 600;">💼 Provider Hub</a>
+        {% elif current_user.role == 'admin' %}
+          <a href="/admin" style="color: #fbbf24; font-size: 0.82rem; font-weight: 600;">🛡️ Admin Dashboard</a>
+        {% endif %}
+        <a href="/logout" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.78rem;">
+          🚪 Logout
+        </a>
+      {% else %}
+        <a href="/auth" class="btn btn-primary btn-sm" style="padding: 4px 12px; font-size: 0.8rem;">
+          🔑 Sign In / Register
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Primary Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <a href="/" style="display: flex; align-items: center; gap: 12px;">
+        <div class="brand-icon">📸</div>
+        <div>
+          <div class="brand-name">SnapLocal</div>
+          <div class="brand-tag">Hyperlocal Photography Marketplace</div>
+        </div>
+      </a>
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" id="nav-explore">
+          🔍 Explore & Book
+        </a>
+      </li>
+
+      {% if is_authenticated %}
+        {% if current_user.role == 'customer' %}
+          <li>
+            <a href="/customer" class="nav-link {% if request.path == '/customer' %}active{% endif %}" id="nav-customer">
+              👥 Customer Bookings
+            </a>
+          </li>
+        {% elif current_user.role == 'provider' %}
+          <li>
+            <a href="/provider" class="nav-link {% if request.path == '/provider' %}active{% endif %}" id="nav-provider">
+              📸 Provider Hub & Earnings
+            </a>
+          </li>
+        {% elif current_user.role == 'admin' %}
+          <li>
+            <a href="/admin" class="nav-link {% if request.path == '/admin' %}active{% endif %}" id="nav-admin">
+              🛡️ Admin Control Center
+            </a>
+          </li>
+        {% endif %}
+      {% else %}
+        <li>
+          <a href="/customer" class="nav-link" id="nav-customer-guest">
+            👥 Customer Portal
+          </a>
+        </li>
+        <li>
+          <a href="/provider" class="nav-link" id="nav-provider-guest">
+            📸 Provider Hub
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+
+    <div class="nav-actions">
+      {% if is_authenticated and current_user.role == 'provider' %}
+        <a href="/provider#manage-listings" class="btn btn-success btn-sm">
+          ➕ Add Service Listing
+        </a>
+      {% else %}
+        <a href="/#package-builder" class="btn btn-primary btn-sm" id="btn-nav-custom-package">
+          ✨ Customize Package
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Page Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Demo Sandbox Checkout Modal (Commission Privacy: Customer only sees Customer Charges) -->
+  <div id="demo-checkout-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">💳</span>
+          <div>
+            <h3 style="color: #fff; font-size: 1.2rem;">Simulated Demo Checkout</h3>
+            <span style="font-size: 0.75rem; color: var(--amber-light); font-weight: 700;">HACKATHON DEMO SANDBOX — ZERO REAL MONEY CHARGED</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeDemoCheckout()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="checkout-sandbox-banner">
+          <span style="font-size: 1.5rem;">🛡️</span>
+          <div style="font-size: 0.82rem; color: #fde68a;">
+            <strong>Simulated Transaction Safety:</strong> Real card numbers, CVVs, and banking passwords are never collected or stored. This checkout simulates instantaneous payment gateway authorization.
+          </div>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem;">
+            <span style="color: var(--text-muted);">Booking Reference:</span>
+            <strong style="color: #fff;" id="checkout-booking-ref">SNAP-BK-XXXX</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+            <span style="color: var(--text-muted);">Total Customer Payment:</span>
+            <strong style="color: var(--amber-light); font-size: 1.2rem;" id="checkout-amount-display">₹0.00</strong>
+          </div>
+        </div>
+
+        <!-- Simulated Payment Method Tabs -->
+        <div class="checkout-methods-tabs">
+          <button type="button" class="tab-btn active" id="tab-btn-upi" data-method="Demo UPI" onclick="switchPaymentTab('upi')">
+            📱 Demo UPI
+          </button>
+          <button type="button" class="tab-btn" id="tab-btn-card" data-method="Demo Card Simulator" onclick="switchPaymentTab('card')">
+            💳 Demo Card Simulator
+          </button>
+          <button type="button" class="tab-btn" id="tab-btn-netbank" data-method="Demo NetBanking" onclick="switchPaymentTab('netbank')">
+            🏛️ Demo NetBanking
+          </button>
+        </div>
+
+        <!-- Tab 1: UPI -->
+        <div id="payment-tab-upi" class="payment-tab-content" style="text-align: center; padding: 10px 0;">
+          <div style="width: 140px; height: 140px; background: #fff; margin: 0 auto 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <rect width="100" height="100" fill="white"/>
+              <path d="M10,10 h30 v30 h-30 z M15,15 v20 h20 v-20 z M20,20 h10 v10 h-10 z" fill="#0f172a"/>
+              <path d="M60,10 h30 v30 h-30 z M65,15 v20 h20 v-20 z M70,20 h10 v10 h-10 z" fill="#0f172a"/>
+              <path d="M10,60 h30 v30 h-30 z M15,65 v20 h20 v-20 z M20,70 h10 v10 h-10 z" fill="#0f172a"/>
+              <rect x="45" y="15" width="8" height="25" fill="#0f172a"/>
+              <rect x="15" y="45" width="25" height="8" fill="#0f172a"/>
+              <rect x="45" y="45" width="12" height="12" fill="#0f172a"/>
+              <rect x="62" y="55" width="28" height="35" fill="#0f172a"/>
+            </svg>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Simulated UPI VPA: <code style="color: var(--amber-light);">demo.snaplocal@sandbox</code></div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Click button below to simulate instantaneous payment authorization</div>
+        </div>
+
+        <!-- Tab 2: Card Simulator -->
+        <div id="payment-tab-card" class="payment-tab-content" style="display: none; padding: 10px 0;">
+          <div style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border-glass); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim);">
+              <span>DEMO PLATINUM VIRTUAL</span>
+              <span>TEST ENV</span>
+            </div>
+            <div style="font-family: monospace; font-size: 1.2rem; letter-spacing: 2px; color: #fff; margin: 14px 0;">
+              •••• •••• •••• 4242
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+              <span>HOLDER: SNAPLOCAL TESTER</span>
+              <span>EXP: 12/28</span>
+            </div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center;">No actual card number or CVV required. One-click simulated authorization.</div>
+        </div>
+
+        <!-- Tab 3: NetBanking -->
+        <div id="payment-tab-netbank" class="payment-tab-content" style="display: none; padding: 10px 0;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass); font-size: 0.85rem;">🏛️ Demo HDFC Bank</div>
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass); font-size: 0.85rem;">🏛️ Demo ICICI Bank</div>
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass); font-size: 0.85rem;">🏛️ Demo SBI Sandbox</div>
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass); font-size: 0.85rem;">🏛️ Demo Axis Bank</div>
+          </div>
+        </div>
+
+        <input type="hidden" id="checkout-idempotency-key" value="">
+
+        <div style="margin-top: 20px;">
+          <button type="button" class="btn btn-primary" id="btn-confirm-demo-payment" style="width: 100%; padding: 14px;" onclick="executeDemoPayment()">
+            Pay Now (Simulate Demo Payment)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt / Tax Invoice Modal (COMMISSION PRIVACY: Customer-facing itemized fees only) -->
+  <div id="receipt-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 style="color: #fff;">Payment Receipt & Audit Record</h3>
+        <button class="modal-close" onclick="closeReceiptModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="background: #0f172a;">
+        <div class="receipt-paper">
+          <div class="receipt-header">
+            <h2 style="font-size: 1.4rem; color: #0f172a; margin-bottom: 2px;">SnapLocal Marketplace</h2>
+            <div style="font-size: 0.75rem; color: #64748b;">Hyperlocal Photography & Rental Solutions</div>
+            <div class="receipt-watermark">DEMO PAYMENT CONFIRMATION</div>
+          </div>
+
+          <div style="margin-bottom: 16px; font-size: 0.85rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Booking Ref:</span>
+              <strong id="rcpt-booking-ref">SNAP-BK-1001</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Transaction Ref:</span>
+              <strong id="rcpt-txn-ref">TXN-DEMO-XXXX</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Date:</span>
+              <span id="rcpt-date">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #64748b;">Payment Method:</span>
+              <span id="rcpt-method">Demo UPI</span>
+            </div>
+          </div>
+
+          <!-- Itemized Breakdown -->
+          <div style="font-size: 0.85rem; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Photographer Fee:</span>
+              <span id="rcpt-p-fee">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Camera Gear Rental:</span>
+              <span id="rcpt-g-fee">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #64748b;">Optional Add-ons:</span>
+              <span id="rcpt-a-fee">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e1; font-weight: 800; font-size: 1.05rem; color: #0f172a;">
+              <span>Total Customer Paid:</span>
+              <span id="rcpt-total" style="color: #b45309;">₹0.00</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 18px;">
+            <button type="button" class="btn btn-secondary btn-sm" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.print()">
+              🖨️ Print Receipt
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Main JavaScript File -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

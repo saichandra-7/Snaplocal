@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if role == 'customer' %}Register as Customer
+  {% else %}Join as Service Provider{% endif %} | SnapLocal
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 620px; margin: 40px auto 80px;">
+
+  <div style="text-align: center; margin-bottom: 28px;">
+    {% if role == 'customer' %}
+      <span class="persona-badge role-customer" style="font-size: 0.85rem; padding: 4px 14px;">👥 CUSTOMER SIGN UP</span>
+      <h1 style="font-size: 2.2rem; color: #fff; margin-top: 10px;">Create Customer Account</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+        Join SnapLocal to book photographers, videographers, and rental kits.
+      </p>
+    {% else %}
+      <span class="persona-badge role-provider" style="font-size: 0.85rem; padding: 4px 14px;">📸 PROVIDER ONBOARDING</span>
+      <h1 style="font-size: 2.2rem; color: #fff; margin-top: 10px;">Join as a Service Provider</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+        Register as a Photographer, Videographer, Cameraman, or Camera Rental House.
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="data-card" style="padding: 32px;">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: #fb7185; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 20px;">
+            ⚠️ {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('role_register', role=role) }}">
+      
+      <!-- Basic Details -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name / Studio Name</label>
+          <input type="text" id="reg-name" name="name" class="form-input" placeholder="e.g. Rahul Sharma" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-phone" class="form-label">Phone Number</label>
+          <input type="text" id="reg-phone" name="phone" class="form-input" placeholder="+91 98765 43210" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px;">
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email Address</label>
+          <input type="email" id="reg-email" name="email" class="form-input" placeholder="name@domain.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-city" class="form-label">City / Area</label>
+          <input type="text" id="reg-city" name="city" class="form-input" value="Bengaluru" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password" class="form-label">Password (min 6 characters)</label>
+        <input type="password" id="reg-password" name="password" class="form-input" placeholder="••••••••" minlength="6" required>
+      </div>
+
+      <!-- Additional Provider Profile & Service Information -->
+      {% if role == 'provider' %}
+        <div style="border-top: 1px dashed var(--border-glass); margin-top: 20px; padding-top: 20px;">
+          <h3 style="font-size: 1.1rem; color: #34d399; margin-bottom: 14px;">Provider & Equipment Details</h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="reg-category" class="form-label">Provider Category</label>
+              <select id="reg-category" name="provider_category" class="form-select">
+                <option value="Weddings & Portraits">Photographer (Weddings & Portraits)</option>
+                <option value="Events & Fashion">Videographer / Event Cameraman</option>
+                <option value="Commercial & Aerial">Aerial Drone & Commercial Cinematography</option>
+                <option value="Cinema & Video Gear">Camera Equipment Rental Provider</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-listing-type" class="form-label">Listing Model</label>
+              <select id="reg-listing-type" name="listing_type" class="form-select">
+                <option value="photographer_with_gear">Photographer with Own Camera</option>
+                <option value="photographer_only">Photographer / Shooter Only (No Gear)</option>
+                <option value="gear_rental">Camera / Lens Rental Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-rate" class="form-label">Base Rate (₹ per session or day)</label>
+            <input type="number" id="reg-rate" name="base_rate" class="form-input" value="2000" min="500" step="100">
+          </div>
+
+          <div class="form-group">
+            <label for="reg-gear" class="form-label">Camera Equipment & Kit Specifications</label>
+            <textarea id="reg-gear" name="gear_details" class="form-textarea" rows="2" placeholder="e.g. Sony A7 IV, 24-70 f/2.8 GM, 50mm prime, Godox V1 flash kit"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-conditions" class="form-label">Rental Conditions / Deposit Terms (Optional)</label>
+            <textarea id="reg-conditions" name="rental_conditions" class="form-textarea" rows="2" placeholder="e.g. Valid Govt ID required, security deposit ₹5,000, return by 8 PM"></textarea>
+          </div>
+        </div>
+      {% endif %}
+
+      <div style="margin-top: 28px;">
+        <button type="submit" class="btn {% if role == 'provider' %}btn-success{% else %}btn-primary{% endif %}" style="width: 100%; padding: 14px; font-size: 1rem;">
+          {% if role == 'customer' %}Create Customer Account{% else %}Register as Service Provider{% endif %}
+        </button>
+      </div>
+
+    </form>
+
+    <div style="margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+      Already have a {{ role|capitalize }} account?
+      <a href="{{ url_for('role_login', role=role) }}" style="color: var(--amber-light); font-weight: 700;">
+        Sign in here →
+      </a>
+      <div style="margin-top: 10px;">
+        <a href="{{ url_for('auth_role_select') }}" style="color: var(--text-dim); font-size: 0.8rem;">
+          ← Switch to another role portal
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

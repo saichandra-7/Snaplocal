@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard | My Bookings & Receipts{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Customer Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="persona-badge role-customer">CUSTOMER PORTAL</span>
+        <span style="color: var(--text-muted); font-size: 0.85rem;">Logged in as: <strong>{{ current_user.name }}</strong> ({{ current_user.email }})</span>
+      </div>
+      <h1 style="font-size: 2.2rem; margin-top: 6px;">My Photography Bookings</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Track your photography reservations, checkout accepted bookings, and view receipts.
+      </p>
+    </div>
+
+    <div>
+      <a href="/#package-builder" class="btn btn-primary">
+        ➕ Book Another Service
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-title">Total Bookings</div>
+      <div class="metric-value">{{ bookings|length }}</div>
+      <div class="metric-sub">Platform reservations</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Awaiting Payment</div>
+      <div class="metric-value accent-amber">
+        {{ bookings | selectattr('payment_status', 'equalto', 'Not Started') | selectattr('booking_status', 'equalto', 'Accepted') | list | length }}
+      </div>
+      <div class="metric-sub">Accepted by provider • Ready for checkout</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Confirmed & Paid</div>
+      <div class="metric-value accent-emerald">
+        {{ bookings | selectattr('payment_status', 'equalto', 'Paid') | list | length }}
+      </div>
+      <div class="metric-sub">Demo payments authorized</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Cancelled / Refunded</div>
+      <div class="metric-value accent-rose">
+        {{ bookings | selectattr('booking_status', 'equalto', 'Cancelled') | list | length }}
+      </div>
+      <div class="metric-sub">Reversals & full credits</div>
+    </div>
+  </div>
+
+  <!-- Bookings List (Customer Privacy: ZERO owner commission details displayed) -->
+  <div class="data-card">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">My Bookings History</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Track <strong>Booking Status</strong> and <strong>Payment Status</strong> in real time.
+        </div>
+      </div>
+    </div>
+
+    {% if bookings %}
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Booking Ref</th>
+              <th>Service Details</th>
+              <th>Booking Status</th>
+              <th>Payment Status</th>
+              <th>Total Customer Price</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+              <tr>
+                <!-- Booking Ref & Type -->
+                <td>
+                  <strong style="color: #fff; font-family: monospace; font-size: 0.95rem;">{{ b.booking_ref }}</strong>
+                  <div style="font-size: 0.72rem; color: var(--amber-light); text-transform: uppercase; font-weight: 700; margin-top: 3px;">
+                    {% if b.booking_type == 'photographer_with_gear' %}
+                      📸 Solo Photographer + Gear
+                    {% elif b.booking_type == 'photographer_only' %}
+                      👤 Freelance Shooter Only
+                    {% elif b.booking_type == 'gear_rental' %}
+                      🎥 Rental Gear Only
+                    {% else %}
+                      ⚡ Combined: Shooter + Gear
+                    {% endif %}
+                  </div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">
+                    Booked on {{ b.created_at[:10] }}
+                  </div>
+                </td>
+
+                <!-- Service Details -->
+                <td>
+                  <div style="font-weight: 600; color: #fff;">
+                    {% if b.photographer_title %}
+                      {{ b.photographer_title }}
+                    {% endif %}
+                    {% if b.photographer_title and b.gear_title %} + {% endif %}
+                    {% if b.gear_title %}
+                      {{ b.gear_title }}
+                    {% endif %}
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    📅 {{ b.service_date }} at {{ b.service_time }}
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">
+                    📍 {{ b.location_address }}
+                  </div>
+                  {% if b.addons %}
+                    <div style="margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap;">
+                      {% for add in b.addons %}
+                        <span style="background: rgba(255,255,255,0.06); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: var(--text-muted);">
+                          + {{ add.title }}
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </td>
+
+                <!-- Booking Status -->
+                <td>
+                  <span class="badge badge-booking-{{ b.booking_status }}">
+                    ● {{ b.booking_status }}
+                  </span>
+                </td>
+
+                <!-- Payment Status -->
+                <td>
+                  <span class="badge badge-payment-{{ b.payment_status.replace(' ', '-') }}">
+                    ● {{ b.payment_status }}
+                  </span>
+                  {% if b.transaction_ref %}
+                    <div style="font-size: 0.7rem; color: var(--text-dim); font-family: monospace; margin-top: 3px;">
+                      {{ b.transaction_ref }}
+                    </div>
+                  {% endif %}
+                </td>
+
+                <!-- Total Customer Price (Zero commission details exposed) -->
+                <td>
+                  <div>
+                    {% if b.payment_status == 'Paid' %}
+                      <span style="font-size: 0.7rem; color: #34d399; font-weight: 700; text-transform: uppercase;">Confirmed Paid:</span>
+                    {% else %}
+                      <span style="font-size: 0.7rem; color: var(--amber-light); font-weight: 700; text-transform: uppercase;">Booking Total:</span>
+                    {% endif %}
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">
+                      ₹{{ b.total_customer_payment }}
+                    </div>
+                  </div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">
+                    All-inclusive fee
+                  </div>
+                </td>
+
+                <!-- Actions -->
+                <td style="text-align: right;">
+                  <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                    <!-- Demo Checkout Action -->
+                    {% if b.booking_status == 'Accepted' and b.payment_status != 'Paid' %}
+                      <button type="button" class="btn btn-primary btn-sm"
+                              onclick="openDemoCheckout({{ b.id }}, '{{ b.booking_ref }}', '{{ b.total_customer_payment }}')">
+                        💳 Proceed to Demo Checkout
+                      </button>
+                    {% elif b.booking_status == 'Pending' %}
+                      <span style="font-size: 0.75rem; color: var(--amber-light); font-style: italic;">
+                        ⏳ Awaiting Provider Acceptance
+                      </span>
+                    {% endif %}
+
+                    <!-- View Receipt Action -->
+                    {% if b.payment_status in ('Paid', 'Refunded') %}
+                      <button type="button" class="btn btn-secondary btn-sm"
+                              onclick="openReceiptModal('{{ b.booking_ref }}', '{{ b.transaction_ref }}', '{{ b.service_date }}', '{{ b.payment_method }}', '{{ b.total_customer_payment }}', '{{ b.photographer_fee }}', '{{ b.gear_fee }}', '{{ b.addons_fee }}')">
+                        📄 View Demo Receipt
+                      </button>
+                    {% endif %}
+
+                    <!-- Cancel Booking Action -->
+                    {% if b.booking_status in ('Pending', 'Accepted') and b.booking_status != 'Cancelled' %}
+                      <button type="button" class="btn btn-danger btn-sm" onclick="cancelBooking({{ b.id }})">
+                        ✕ Cancel
+                      </button>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 20px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📷</div>
+        <h3 style="color: #fff; margin-bottom: 8px;">No Bookings Found</h3>
+        <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto 20px;">
+          You haven't submitted any photography or gear rental bookings yet.
+        </p>
+        <a href="/#package-builder" class="btn btn-primary">
+          Explore Creators & Customize Package
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

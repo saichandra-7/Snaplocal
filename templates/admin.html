@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Control Center | SnapLocal Platform Operations{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Admin Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="persona-badge role-admin">PLATFORM OWNER ADMIN</span>
+        <span style="color: var(--text-muted); font-size: 0.85rem;">Authenticated as: <strong>{{ current_user.name }}</strong> ({{ current_user.email }})</span>
+      </div>
+      <h1 style="font-size: 2.2rem; margin-top: 6px;">SnapLocal Platform Control Center</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Oversee gross booking volume, monitor platform revenue, configure commissions, and disburse payouts.
+      </p>
+    </div>
+
+    <div>
+      <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700;">
+        🛡️ Protected Role • Full Marketplace Clearance
+      </span>
+    </div>
+  </div>
+
+  <!-- 1. Key Business Metrics Section -->
+  <div class="section-header" style="text-align: left; margin-bottom: 18px;">
+    <div class="section-subtitle">Real-Time Financial Intelligence</div>
+    <h2 style="font-size: 1.5rem; color: #fff;">Key Marketplace Business Metrics</h2>
+  </div>
+
+  <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+    <!-- Metric 1: Total Booking Value (GMV) -->
+    <div class="metric-card">
+      <div class="metric-title">Total Booking Value (GMV)</div>
+      <div class="metric-value accent-indigo">₹{{ metrics.total_booking_value }}</div>
+      <div class="metric-sub">Gross customer merchandise volume (paid, non-cancelled)</div>
+    </div>
+
+    <!-- Metric 2: Total Commission Earned (Platform Revenue) -->
+    <div class="metric-card" style="border: 1px solid var(--border-accent);">
+      <div class="metric-title">Total Commission Earned (Platform Revenue)</div>
+      <div class="metric-value accent-amber">₹{{ metrics.total_commission_earned }}</div>
+      <div class="metric-sub">Actual SnapLocal net revenue (not gross merchandise)</div>
+    </div>
+
+    <!-- Metric 3: Successful Paid Bookings -->
+    <div class="metric-card">
+      <div class="metric-title">Successful Paid Bookings</div>
+      <div class="metric-value accent-emerald">{{ metrics.successful_paid_count }}</div>
+      <div class="metric-sub">Completed simulated customer payments</div>
+    </div>
+  </div>
+
+  <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 36px;">
+    <!-- Metric 4: Average Booking Amount -->
+    <div class="metric-card">
+      <div class="metric-title">Average Booking Value (AOV)</div>
+      <div class="metric-value accent-cyan">₹{{ metrics.avg_booking_amount }}</div>
+      <div class="metric-sub">Mean customer checkout spend per booking</div>
+    </div>
+
+    <!-- Metric 5: Pending Provider Payouts -->
+    <div class="metric-card">
+      <div class="metric-title">Pending Provider Payout Liabilities</div>
+      <div class="metric-value accent-rose">₹{{ metrics.pending_provider_payouts }}</div>
+      <div class="metric-sub">Funds in escrow / awaiting administrative disbursement</div>
+    </div>
+
+    <!-- Metric 6: Cancellations and Refunds Total -->
+    <div class="metric-card">
+      <div class="metric-title">Cancellations & Refunds Total</div>
+      <div class="metric-value" style="color: #cbd5e1;">₹{{ metrics.cancellation_refunds_total }}</div>
+      <div class="metric-sub">Total customer refunds & commission adjustments</div>
+    </div>
+  </div>
+
+  <!-- 2. Platform Commission Configuration -->
+  <div class="data-card" style="margin-bottom: 36px;">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">⚙️ Platform Commission Configuration</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Configure platform fee percentage. Stored snapshots prevent changes from silently altering historical bookings.
+        </div>
+      </div>
+      <div>
+        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.9rem; padding: 6px 14px;">
+          Current Default: <strong>{{ platform_config.commission_rate }}%</strong>
+        </span>
+      </div>
+    </div>
+
+    <div style="padding: 24px;">
+      <form onsubmit="updateAdminCommission(event)" style="display: grid; grid-template-columns: 1fr 1.5fr auto; gap: 16px; align-items: flex-end;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="admin-commission-rate-input" class="form-label">New Commission Percentage (%)</label>
+          <input type="number" step="0.5" min="0" max="50" id="admin-commission-rate-input" class="form-input" value="{{ platform_config.commission_rate }}" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="admin-commission-reason" class="form-label">Update Reason / Administrative Note</label>
+          <input type="text" id="admin-commission-reason" class="form-input" placeholder="e.g. Festival promotional rate or revised marketplace fee">
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">
+            Save Commission Rate
+          </button>
+        </div>
+      </form>
+
+      <div style="margin-top: 14px; font-size: 0.8rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border-glass);">
+        🔒 <strong>Historical Snapshot Protection:</strong> When you update the commission rate, subsequent bookings will inherit the new rate. Previous bookings retain their historical snapshotted commission rate, eligible amount, and payable amounts.
+      </div>
+
+      {% if comm_history %}
+        <div style="margin-top: 20px;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+            Recent Commission Audit Changes:
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for ch in comm_history[:3] %}
+              <div style="font-size: 0.78rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: 6px;">
+                <strong>{{ ch.rate_percentage }}%</strong> • {{ ch.reason or 'Adjusted by Admin' }} • <span style="color: var(--text-dim);">{{ ch.created_at[:16] }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 3. Provider Listings Moderation -->
+  <div class="data-card" style="margin-bottom: 36px;">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">🛡️ Provider Listings Moderation & Fraud Prevention</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Review provider profiles, rental packages, and toggle active/deactivated status to suspend inappropriate listings.
+        </div>
+      </div>
+      <div>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+          {{ listings|length }} Total Listings
+        </span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Listing Title & Category</th>
+            <th>Provider</th>
+            <th>Type</th>
+            <th>Base Rate</th>
+            <th>Status</th>
+            <th style="text-align: right;">Moderation Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in listings %}
+            <tr>
+              <td>
+                <strong style="color: #fff;">{{ l.title }}</strong>
+                <div style="font-size: 0.75rem; color: var(--amber-light);">{{ l.category }} • {{ l.location }}</div>
+              </td>
+
+              <td>
+                <div style="font-weight: 500; color: #fff;">{{ l.provider_name }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ l.provider_email }}</div>
+              </td>
+
+              <td>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">
+                  {{ l.listing_type.replace('_', ' ').capitalize() }}
+                </span>
+              </td>
+
+              <td>
+                <strong style="color: #fff;">₹{{ l.base_rate }}</strong>
+                <span style="font-size: 0.72rem; color: var(--text-dim);">/ {{ l.rate_unit }}</span>
+              </td>
+
+              <td>
+                {% if l.status == 'active' %}
+                  <span class="badge badge-booking-Accepted">● ACTIVE</span>
+                {% else %}
+                  <span class="badge badge-booking-Rejected">● DEACTIVATED</span>
+                {% endif %}
+              </td>
+
+              <td style="text-align: right;">
+                <button type="button" class="btn {% if l.status == 'active' %}btn-danger{% else %}btn-success{% endif %} btn-sm" onclick="toggleListingStatus({{ l.id }})">
+                  {% if l.status == 'active' %}
+                    Deactivate
+                  {% else %}
+                    Activate
+                  {% endif %}
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Provider Payout Disbursements Management -->
+  <div class="data-card" style="margin-bottom: 36px;">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">💸 Provider Payout Disbursements</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Process payouts for finished shoots. Shoot must reach <strong>Completed</strong> status before funds are eligible for disbursement.
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-payout-Payable">
+          {{ payout_records | selectattr('status', 'equalto', 'Payable') | list | length }} Eligible Payouts
+        </span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Booking Ref</th>
+            <th>Provider</th>
+            <th>Gross Amount</th>
+            <th>Commission Deducted</th>
+            <th>Net Payable</th>
+            <th>Payout Status</th>
+            <th style="text-align: right;">Disbursement Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pr in payout_records %}
+            <tr>
+              <td>
+                <strong style="color: #fff; font-family: monospace;">{{ pr.booking_ref }}</strong>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">Role: {{ pr.role_in_booking }}</div>
+              </td>
+
+              <td>
+                <div style="font-weight: 500; color: #fff;">{{ pr.provider_name }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ pr.provider_email }}</div>
+              </td>
+
+              <td>₹{{ pr.gross_amount }}</td>
+
+              <td>
+                <span style="color: #fb7185; font-weight: 700;">-₹{{ pr.commission_deducted }}</span>
+                <span style="font-size: 0.72rem; color: var(--text-dim);">({{ pr.commission_rate }}%)</span>
+              </td>
+
+              <td>
+                <strong style="color: #34d399; font-size: 1rem;">₹{{ pr.net_payable }}</strong>
+              </td>
+
+              <td>
+                <span class="badge badge-payout-{{ pr.status.replace(' ', '-') }}">
+                  ● {{ pr.status }}
+                </span>
+                {% if pr.payout_ref %}
+                  <div style="font-size: 0.7rem; color: var(--text-dim); font-family: monospace; margin-top: 2px;">
+                    {{ pr.payout_ref }}
+                  </div>
+                {% endif %}
+              </td>
+
+              <td style="text-align: right;">
+                {% if pr.status == 'Payable' %}
+                  <button type="button" class="btn btn-success btn-sm" onclick="disbursePayout({{ pr.id }})">
+                    💳 Disburse Payout
+                  </button>
+                {% elif pr.status == 'Pending' %}
+                  <span style="font-size: 0.75rem; color: var(--amber-light);">
+                    Escrow Held (Shoot Pending)
+                  </span>
+                {% elif pr.status == 'Paid' %}
+                  <span style="font-size: 0.75rem; color: #34d399; font-weight: 600;">
+                    ✓ Settled
+                  </span>
+                {% elif pr.status == 'Reversed' %}
+                  <span style="font-size: 0.75rem; color: var(--rose-accent);">
+                    Reversed (Refund)
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. All Bookings Master Audit Table -->
+  <div class="data-card" style="margin-bottom: 36px;">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">📋 All Platform Bookings & Statuses Audit</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Comprehensive view of all customer bookings, separate status fields, and financial snapshots.
+        </div>
+      </div>
+      <div>
+        <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">
+          {{ bookings|length }} Platform Bookings
+        </span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Booking Ref</th>
+            <th>Customer</th>
+            <th>Shoot Details</th>
+            <th>Customer Paid</th>
+            <th>Commission Earned</th>
+            <th>Provider Net</th>
+            <th>Booking Status</th>
+            <th>Payment Status</th>
+            <th>Payout Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr>
+              <td>
+                <strong style="color: #fff; font-family: monospace;">{{ b.booking_ref }}</strong>
+                <div style="font-size: 0.72rem; color: var(--amber-light);">{{ b.booking_type.replace('_', ' ') }}</div>
+              </td>
+
+              <td>
+                <div style="font-weight: 500; color: #fff;">{{ b.customer_name }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ b.customer_email }}</div>
+              </td>
+
+              <td>
+                <div style="color: #fff; font-weight: 500;">📅 {{ b.service_date }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">📍 {{ b.location_address }}</div>
+              </td>
+
+              <td>
+                <strong style="color: #fff;">₹{{ b.total_customer_payment }}</strong>
+              </td>
+
+              <td>
+                <strong style="color: #fb7185;">₹{{ b.commission_amount }}</strong>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">({{ b.commission_rate_applied }}%)</div>
+              </td>
+
+              <td>
+                <strong style="color: #34d399;">₹{{ b.provider_payable_amount }}</strong>
+              </td>
+
+              <td>
+                <span class="badge badge-booking-{{ b.booking_status }}">
+                  ● {{ b.booking_status }}
+                </span>
+              </td>
+
+              <td>
+                <span class="badge badge-payment-{{ b.payment_status.replace(' ', '-') }}">
+                  ● {{ b.payment_status }}
+                </span>
+              </td>
+
+              <td>
+                <span class="badge badge-payout-{{ b.payout_status.replace(' ', '-') }}">
+                  ● {{ b.payout_status }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 6. Customers & Service Providers Directory -->
+  <div class="data-card" style="margin-bottom: 36px;">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">👥 Marketplace Users & Role Access</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Customer accounts, verified photography and rental providers, and administrator accounts.
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td><strong style="color: #fff;">{{ u.name }}</strong></td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span class="persona-badge role-{{ u.role }}">
+                  ● {{ u.role|capitalize }}
+                </span>
+              </td>
+              <td>{{ u.phone }}</td>
+              <td>{{ u.city }}</td>
+              <td style="font-size: 0.8rem; color: var(--text-dim);">{{ u.created_at[:10] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. Cancellations and Refunds Log -->
+  <div class="data-card">
+    <div class="card-header-flex">
+      <div>
+        <h2 class="card-title">🔄 Cancellations & Refunds Ledger</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Audited log of refund reversals, customer reimbursement amounts, and commission adjustments.
+        </div>
+      </div>
+    </div>
+
+    {% if refunds %}
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Refund Ref</th>
+              <th>Booking Ref</th>
+              <th>Refund Amount</th>
+              <th>Commission Adjusted</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Processed Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rf in refunds %}
+              <tr>
+                <td><strong style="color: #a5b4fc; font-family: monospace;">{{ rf.refund_ref }}</strong></td>
+                <td><span style="font-family: monospace;">{{ rf.booking_ref }}</span></td>
+                <td><strong style="color: #fff;">₹{{ rf.amount }}</strong></td>
+                <td><span style="color: #fb7185;">-₹{{ rf.commission_adjusted }}</span></td>
+                <td style="font-size: 0.85rem; color: var(--text-muted);">{{ rf.reason }}</td>
+                <td><span class="badge badge-booking-Accepted">✓ {{ rf.status }}</span></td>
+                <td style="font-size: 0.8rem; color: var(--text-dim);">{{ rf.created_at[:16] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+        No refunds currently processed.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
